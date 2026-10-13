@@ -78,6 +78,11 @@ coverage.xml
 .ipynb_checkpoints/
 *.ipynb
 
+# --- Office temp/lock files ---
+~$*.pptx
+~$*.docx
+~$*.xlsx
+
 # --- Node (if any tooling is added) ---
 node_modules/
 npm-debug.log*
