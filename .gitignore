@@ -1,0 +1,83 @@
+# ============================================================
+#  NutriGuide Agentic AI — .gitignore
+# ============================================================
+
+# --- Environment & Secrets (NEVER commit these) ---
+.env
+*.env
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.cache/
+.pytest_cache/
+*.pyc
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+.python-version
+
+# --- Flask ---
+instance/
+flask_session/
+
+# --- User-generated plans (optional: comment out to track samples) ---
+plans/*.md
+!plans/sample_nutrition_plan.md
+
+# --- Logs ---
+*.log
+logs/
+*.log.*
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# --- Testing ---
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# --- Packaging ---
+*.tar.gz
+*.zip
+*.whl
+
+# --- Jupyter (if used for experiments) ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- Node (if any tooling is added) ---
+node_modules/
+npm-debug.log*

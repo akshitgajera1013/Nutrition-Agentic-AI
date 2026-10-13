@@ -1,0 +1,22 @@
+# ============================================================
+#  NutriGuide — Nutrition Agentic AI
+#  Python Dependencies
+#  Install: pip install -r requirements.txt
+# ============================================================
+
+# --- Web Framework ---
+flask==3.0.3
+flask-cors==4.0.1
+
+# --- IBM Watsonx.ai SDK (IBM Granite LLM) ---
+ibm-watsonx-ai==1.1.2
+
+# --- Environment & Config ---
+python-dotenv==1.0.1
+
+# --- Utilities ---
+markdown==3.6
+requests==2.32.3
+
+# --- WSGI server (production) ---
+gunicorn==22.0.0

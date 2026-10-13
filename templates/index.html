@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NutriGuide — Nutrition Agentic AI | Powered by IBM Granite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="app-header">
+    <div class="header-inner">
+        <div class="logo-area">
+            <div class="logo-icon">🥗</div>
+            <div class="logo-text">
+                <h1>NutriGuide <span class="badge-ai">AI</span></h1>
+                <p class="logo-sub">Agentic AI Nutrition Planner · Powered by IBM Granite</p>
+            </div>
+        </div>
+        <div class="header-badges">
+            <span class="badge badge-granite">IBM Granite 3.3</span>
+            <span class="badge badge-watsonx">Watsonx.ai</span>
+            <span class="badge badge-ethics">Ethical AI</span>
+        </div>
+    </div>
+</header>
+
+<!-- ===== DISCLAIMER BANNER ===== -->
+<div class="disclaimer-banner">
+    <span class="disclaimer-icon">⚕️</span>
+    <strong>Medical Disclaimer:</strong> This app provides general nutritional information only. It is NOT medical advice. Always consult a qualified healthcare professional before making dietary changes.
+</div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<main class="main-layout">
+
+    <!-- LEFT PANEL: User Profile Form -->
+    <aside class="panel panel-form">
+        <div class="panel-header">
+            <span class="panel-icon">👤</span>
+            <h2>Your Profile</h2>
+        </div>
+
+        <form id="userForm" novalidate>
+            <div class="form-group">
+                <label for="name">Full Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="e.g., Priya Sharma"
+                       autocomplete="given-name" maxlength="60" required />
+                <span class="field-hint">Used to personalise your plan</span>
+            </div>
+
+            <div class="form-group">
+                <label for="age">Age <span class="required">*</span></label>
+                <input type="number" id="age" name="age" placeholder="e.g., 35"
+                       min="5" max="110" required />
+            </div>
+
+            <div class="form-group">
+                <label for="diet_preference">Diet Preference <span class="required">*</span></label>
+                <select id="diet_preference" name="diet_preference" required>
+                    <option value="" disabled selected>— Select diet type —</option>
+                    <option value="Vegetarian">🥦 Vegetarian</option>
+                    <option value="Non-Vegetarian">🍗 Non-Vegetarian</option>
+                    <option value="Vegan">🌱 Vegan</option>
+                    <option value="Pescatarian">🐟 Pescatarian</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="medical_history">Medical History</label>
+                <textarea id="medical_history" name="medical_history"
+                          placeholder="e.g., Type 2 diabetes, high blood pressure, lactose intolerant"
+                          rows="3" maxlength="400"></textarea>
+                <span class="field-hint">Optional — helps personalise your plan safely</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location_city">City <span class="required">*</span></label>
+                    <input type="text" id="location_city" name="location_city"
+                           placeholder="e.g., Mumbai" maxlength="80" required />
+                </div>
+                <div class="form-group">
+                    <label for="location_country">Country <span class="required">*</span></label>
+                    <input type="text" id="location_country" name="location_country"
+                           placeholder="e.g., India" maxlength="80" required />
+                </div>
+            </div>
+
+            <div id="formError" class="error-msg hidden"></div>
+
+            <button type="submit" id="generateBtn" class="btn btn-primary btn-full">
+                <span class="btn-icon">✨</span>
+                Generate My Nutrition Plan
+            </button>
+        </form>
+
+        <!-- Status indicator -->
+        <div id="llmStatus" class="llm-status"></div>
+    </aside>
+
+    <!-- RIGHT PANEL: Plan Output + Q&A -->
+    <section class="panel panel-output">
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="planTab">📋 Nutrition Plan</button>
+            <button class="tab-btn" data-tab="qaTab">💬 Ask NutriGuide</button>
+        </div>
+
+        <!-- Plan Tab -->
+        <div id="planTab" class="tab-content active">
+            <!-- Loading state -->
+            <div id="planLoading" class="loading-state hidden">
+                <div class="spinner"></div>
+                <p>🤖 IBM Granite is crafting your personalized plan…</p>
+                <p class="loading-sub">This may take a few seconds</p>
+            </div>
+
+            <!-- Welcome state -->
+            <div id="planWelcome" class="welcome-state">
+                <div class="welcome-icon">🌿</div>
+                <h3>Your Personalized Plan Awaits</h3>
+                <p>Fill in your profile on the left and click <strong>Generate My Nutrition Plan</strong>.</p>
+                <p>Our IBM Granite-powered AI agent will create a full 7-day personalized nutrition plan based on your health profile, dietary preferences, and location.</p>
+                <div class="welcome-features">
+                    <div class="feature-item">📊 Calorie &amp; Macro Targets</div>
+                    <div class="feature-item">🗓️ 7-Day Meal Plan</div>
+                    <div class="feature-item">🛒 Grocery List</div>
+                    <div class="feature-item">💧 Hydration Guide</div>
+                    <div class="feature-item">⚠️ Condition-Specific Advice</div>
+                    <div class="feature-item">📥 Download as .md File</div>
+                </div>
+            </div>
+
+            <!-- Plan result -->
+            <div id="planResult" class="plan-result hidden">
+                <div class="plan-meta" id="planMeta"></div>
+                <div class="plan-actions">
+                    <button id="downloadBtn" class="btn btn-secondary">
+                        📥 Download Plan (.md)
+                    </button>
+                    <button id="copyBtn" class="btn btn-outline">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button id="newPlanBtn" class="btn btn-outline">
+                        🔄 New Plan
+                    </button>
+                </div>
+                <div id="planContent" class="plan-markdown"></div>
+            </div>
+        </div>
+
+        <!-- Q&A Tab -->
+        <div id="qaTab" class="tab-content hidden">
+            <div class="qa-header">
+                <h3>💬 Ask NutriGuide AI</h3>
+                <p>Ask any nutrition-related question. Our IBM Granite agent answers in context of your profile.</p>
+            </div>
+
+            <div class="qa-suggestions">
+                <p class="suggestions-label">Quick questions:</p>
+                <button class="suggestion-chip" data-q="What are the best protein sources for my diet?">Protein sources</button>
+                <button class="suggestion-chip" data-q="How much water should I drink daily?">Daily water intake</button>
+                <button class="suggestion-chip" data-q="What vitamins and supplements do I need?">Vitamins & supplements</button>
+                <button class="suggestion-chip" data-q="How can I manage my weight healthily?">Weight management</button>
+                <button class="suggestion-chip" data-q="What foods should I avoid for better energy?">Foods to avoid</button>
+                <button class="suggestion-chip" data-q="What are healthy snack options for my diet type?">Healthy snacks</button>
+            </div>
+
+            <div class="qa-input-area">
+                <textarea id="queryInput" placeholder="Type your nutrition question here…"
+                          rows="3" maxlength="500"></textarea>
+                <div id="charCount" class="char-count">0 / 500</div>
+                <div id="qaError" class="error-msg hidden"></div>
+                <button id="askBtn" class="btn btn-primary">
+                    <span class="btn-icon">🤖</span> Ask IBM Granite
+                </button>
+            </div>
+
+            <div id="qaLoading" class="loading-state hidden">
+                <div class="spinner"></div>
+                <p>IBM Granite is thinking…</p>
+            </div>
+
+            <div id="qaHistory" class="qa-history"></div>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="app-footer">
+    <div class="footer-inner">
+        <div class="footer-disclaimer">
+            <strong>⚕️ Medical Disclaimer:</strong> NutriGuide provides general nutritional information only.
+            It is NOT a substitute for professional medical advice, diagnosis, or treatment.
+            Always consult a qualified healthcare provider before making dietary changes.
+        </div>
+        <div class="footer-info">
+            <span>NutriGuide Agentic AI</span>
+            <span>·</span>
+            <span>IBM Granite 3.3 8B Instruct</span>
+            <span>·</span>
+            <span>Watsonx.ai</span>
+            <span>·</span>
+            <span>Ethical AI · HAM Principles</span>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
